@@ -270,12 +270,23 @@ export function buildBouquet({ templateId, palette, params, seed }) {
   return { heads: built, eucalyptus }
 }
 
+// Dáng hoa = hình dáng cụm hoa
 export const TEMPLATES = [
-  { id: 'round', name: 'Bó tròn', hint: 'Cổ điển, đầy đặn' },
-  { id: 'cascade', name: 'Bó thả', hint: 'Buông rủ mềm mại' },
-  { id: 'heart', name: 'Bó tim', hint: 'Xếp thành trái tim' },
-  { id: 'asymmetric', name: 'Bó lệch', hint: 'Nghệ thuật, phá cách' },
-  { id: 'petite', name: 'Bó gọn', hint: 'Nhỏ xinh, tối giản' },
+  { id: 'round', name: 'Tròn', hint: 'Cổ điển, đầy đặn' },
+  { id: 'cascade', name: 'Thả', hint: 'Buông rủ mềm mại' },
+  { id: 'heart', name: 'Tim', hint: 'Xếp thành trái tim' },
+  { id: 'asymmetric', name: 'Lệch', hint: 'Nghệ thuật, phá cách' },
+  { id: 'petite', name: 'Gọn', hint: 'Nhỏ xinh, tối giản' },
+]
+
+// Kiểu bó = cách gói / đựng hoa
+export const WRAPS = [
+  { id: 'kraft', name: 'Giấy kraft', hint: 'Mộc, ấm' },
+  { id: 'tissue', name: 'Giấy lụa Hàn', hint: 'Bồng bềnh, sang' },
+  { id: 'box', name: 'Hộp hoa', hint: 'Thanh lịch' },
+  { id: 'vase', name: 'Bình thủy tinh', hint: 'Nhẹ nhàng' },
+  { id: 'basket', name: 'Giỏ mây', hint: 'Mộc mạc' },
+  { id: 'bag', name: 'Túi giấy', hint: 'Trẻ trung' },
 ]
 
 // Bảng màu gợi ý theo gu của cô ấy (xanh dương, xám, be, vàng nhạt)

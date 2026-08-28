@@ -5,6 +5,7 @@ import PetalBackground from './components/PetalBackground'
 import { useAudio } from './hooks/useAudio'
 import {
   TEMPLATES,
+  WRAPS,
   PRESET_PALETTES,
   DEFAULT_PALETTE,
 } from './lib/bouquet'
@@ -20,9 +21,33 @@ const stepVariants = {
 }
 
 export default function App() {
+  // Chế độ xem lưới tạm để soi các kiểu bó: mở /?grid=wraps
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('grid')) {
+    return <PreviewGrid />
+  }
+  return <MainApp />
+}
+
+function PreviewGrid() {
+  const pal = DEFAULT_PALETTE
+  const p = { blooms: 4, density: 9, spread: 0.6 }
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16, background: '#f3efe6' }}>
+      {WRAPS.map((w) => (
+        <div key={w.id} style={{ width: 190, background: '#fff', borderRadius: 16, padding: 8, textAlign: 'center' }}>
+          <Bouquet templateId="round" wrapId={w.id} palette={pal} params={p} seed={7} style={{ height: 260 }} />
+          <b>{w.name}</b>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function MainApp() {
   const [step, setStep] = useState(1)
   const [palette, setPalette] = useState(DEFAULT_PALETTE)
   const [templateId, setTemplateId] = useState('round')
+  const [wrapId, setWrapId] = useState('kraft')
   const [params, setParams] = useState({ blooms: 4, density: 26, spread: 0.6 })
   const [seed, setSeed] = useState(7)
   const music = useAudio('/music.mp3')
@@ -63,6 +88,8 @@ export default function App() {
               <StepDesign
                 templateId={templateId}
                 setTemplateId={setTemplateId}
+                wrapId={wrapId}
+                setWrapId={setWrapId}
                 params={params}
                 setParams={setParams}
                 palette={palette}
@@ -78,6 +105,7 @@ export default function App() {
             {step === 5 && (
               <StepReveal
                 templateId={templateId}
+                wrapId={wrapId}
                 palette={palette}
                 params={params}
                 seed={seed}
@@ -214,6 +242,8 @@ function StepColors({ palette, setPalette, onBack, onNext }) {
 function StepDesign({
   templateId,
   setTemplateId,
+  wrapId,
+  setWrapId,
   params,
   setParams,
   palette,
@@ -228,18 +258,40 @@ function StepDesign({
   return (
     <div className="card">
       <p className="step-title">Thiết kế bó hoa 💐</p>
-      <p className="step-desc">Chọn một dáng bó, rồi tinh chỉnh cho vừa ý.</p>
+      <p className="step-desc">Chọn kiểu bó, dáng hoa, rồi tinh chỉnh cho vừa ý.</p>
 
       <div className="mini-preview">
         <Bouquet
           templateId={templateId}
+          wrapId={wrapId}
           palette={palette}
           params={params}
           seed={seed}
         />
       </div>
 
-      <p className="section-label">Dáng bó</p>
+      <p className="section-label">Kiểu bó</p>
+      <div className="template-grid">
+        {WRAPS.map((w) => (
+          <button
+            key={w.id}
+            className={`template-card ${wrapId === w.id ? 'selected' : ''}`}
+            onClick={() => setWrapId(w.id)}
+          >
+            <Bouquet
+              templateId="round"
+              wrapId={w.id}
+              palette={GRAY_PALETTE}
+              params={{ blooms: 4, density: 16, spread: 0.5 }}
+              seed={3}
+            />
+            <b>{w.name}</b>
+            <small>{w.hint}</small>
+          </button>
+        ))}
+      </div>
+
+      <p className="section-label">Dáng hoa</p>
       <div className="template-grid">
         {TEMPLATES.map((t) => (
           <button
@@ -249,8 +301,9 @@ function StepDesign({
           >
             <Bouquet
               templateId={t.id}
+              wrapId={wrapId}
               palette={GRAY_PALETTE}
-              params={{ blooms: 4, density: 18, spread: 0.5 }}
+              params={{ blooms: 4, density: 16, spread: 0.5 }}
               seed={3}
             />
             <b>{t.name}</b>
@@ -342,7 +395,7 @@ function StepConfirm({ onReady, onRedo }) {
 }
 
 /* ---------- Bước 5: Hé lộ bó hoa ---------- */
-function StepReveal({ templateId, palette, params, seed, onRedo }) {
+function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
   const burst = useMemo(
     () =>
       Array.from({ length: 14 }, (_, i) => ({
@@ -366,6 +419,7 @@ function StepReveal({ templateId, palette, params, seed, onRedo }) {
       >
         <Bouquet
           templateId={templateId}
+          wrapId={wrapId}
           palette={palette}
           params={params}
           seed={seed}
