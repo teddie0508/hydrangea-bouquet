@@ -5,6 +5,7 @@ import PetalBackground from './components/PetalBackground'
 import MusicPlayer from './components/MusicPlayer'
 import { useMusicPlayer } from './hooks/useMusicPlayer'
 import { SONGS } from './lib/songs'
+import { downloadBouquetPng } from './lib/exportImage'
 import {
   TEMPLATES,
   WRAPS,
@@ -427,6 +428,25 @@ function StepConfirm({ onReady, onRedo }) {
 
 /* ---------- Bước 5: Hé lộ bó hoa ---------- */
 function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
+  const bouquetRef = useRef(null)
+  const [saving, setSaving] = useState(false)
+
+  const saveImage = async () => {
+    const svg = bouquetRef.current?.querySelector('svg')
+    if (!svg || saving) return
+    setSaving(true)
+    try {
+      await downloadBouquetPng(svg, {
+        fileName: 'bo-hoa-tang-mina.png',
+        caption: 'Tặng Mina 🌸',
+        subtitle: 'Mong Mina luôn vui và bình yên 💙',
+      })
+    } catch (e) {
+      console.error('Không xuất được ảnh:', e)
+    }
+    setSaving(false)
+  }
+
   const burst = useMemo(
     () =>
       Array.from({ length: 14 }, (_, i) => ({
@@ -444,6 +464,7 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
     <div className="card reveal-wrap">
       <motion.div
         className="reveal-bouquet"
+        ref={bouquetRef}
         initial={{ scale: 0.4, opacity: 0, rotate: -6 }}
         animate={{ scale: 1, opacity: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 90, damping: 12, delay: 0.15 }}
@@ -500,6 +521,9 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
       >
+        <button className="btn" onClick={saveImage} disabled={saving}>
+          {saving ? 'Đang lưu…' : '📷 Tải ảnh về'}
+        </button>
         <button className="btn ghost" onClick={onRedo}>
           Làm lại bó khác
         </button>
