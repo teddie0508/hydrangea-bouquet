@@ -2,7 +2,9 @@ import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Bouquet from './components/Bouquet'
 import PetalBackground from './components/PetalBackground'
-import { useAudio } from './hooks/useAudio'
+import MusicPlayer from './components/MusicPlayer'
+import { useMusicPlayer } from './hooks/useMusicPlayer'
+import { SONGS } from './lib/songs'
 import {
   TEMPLATES,
   WRAPS,
@@ -67,13 +69,14 @@ function MainApp() {
   const [wrapId, setWrapId] = useState('kraft')
   const [params, setParams] = useState({ blooms: 4, density: 26, spread: 0.6 })
   const [seed, setSeed] = useState(7)
-  const music = useAudio('/music.mp3')
+  const player = useMusicPlayer(SONGS)
 
   const go = (n) => setStep(n)
 
   return (
     <div className="app">
       <PetalBackground palette={palette} />
+      <MusicPlayer player={player} songs={SONGS} />
       <div className="stage">
         {step > 1 && step < 5 && (
           <div className="progress">
@@ -92,7 +95,7 @@ function MainApp() {
             exit="exit"
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            {step === 1 && <StepIntro music={music} onNext={() => go(2)} />}
+            {step === 1 && <StepIntro player={player} onNext={() => go(2)} />}
             {step === 2 && (
               <StepColors
                 palette={palette}
@@ -137,7 +140,7 @@ function MainApp() {
 }
 
 /* ---------- Bước 1: Lời chào ---------- */
-function StepIntro({ music, onNext }) {
+function StepIntro({ player, onNext }) {
   return (
     <div className="card center">
       <div className="sticker-slot" aria-hidden>
@@ -153,11 +156,11 @@ function StepIntro({ music, onNext }) {
 
       <div className="btn-row">
         <button
-          className={`music-toggle ${music.playing ? 'on' : ''}`}
-          onClick={music.toggle}
+          className={`music-toggle ${player.playing ? 'on' : ''}`}
+          onClick={player.toggle}
         >
           <span className="dot" />
-          {music.playing ? 'Đang phát nhạc' : 'Bật nhạc nghe nhé'}
+          {player.playing ? 'Đang phát nhạc' : 'Bật nhạc nghe nhé'}
         </button>
       </div>
       <p className="note">
