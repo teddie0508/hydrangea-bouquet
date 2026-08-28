@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Bouquet from './components/Bouquet'
 import PetalBackground from './components/PetalBackground'
@@ -59,6 +59,17 @@ function PreviewGrid() {
   )
 }
 
+function Loader() {
+  return (
+    <div className="loader">
+      <div className="loader-flower" aria-hidden>
+        🌸
+      </div>
+      <p>đang tải…</p>
+    </div>
+  )
+}
+
 function MainApp() {
   const initialStep =
     typeof window !== 'undefined'
@@ -72,7 +83,37 @@ function MainApp() {
   const [seed, setSeed] = useState(7)
   const player = useMusicPlayer(SONGS)
 
+  // Chờ tải sẵn ảnh sticker (+ font) rồi mới hiện nội dung, tránh ảnh load lâu
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    let done = false
+    const finish = () => {
+      if (!done) {
+        done = true
+        setReady(true)
+      }
+    }
+    const imgs = ['/stickers/1.gif', '/stickers/2.gif'].map(
+      (src) =>
+        new Promise((res) => {
+          const im = new Image()
+          im.onload = res
+          im.onerror = res
+          im.src = src
+        }),
+    )
+    const fonts =
+      typeof document !== 'undefined' && document.fonts
+        ? document.fonts.ready.catch(() => {})
+        : Promise.resolve()
+    Promise.all([...imgs, fonts]).then(finish)
+    const t = setTimeout(finish, 6000) // fallback nếu mạng lỗi/quá chậm
+    return () => clearTimeout(t)
+  }, [])
+
   const go = (n) => setStep(n)
+
+  if (!ready) return <Loader />
 
   return (
     <div className="app">

@@ -32,19 +32,15 @@ export default function MusicPlayer({ player, songs }) {
         </div>
 
         <div className="mp-controls">
-          {multi && (
-            <button className="mp-icon-btn" onClick={player.prev} aria-label="Bài trước">
-              ⏮
-            </button>
-          )}
+          <button className="mp-icon-btn" onClick={player.prev} aria-label="Bài trước">
+            ⏮
+          </button>
           <button className="mp-play" onClick={player.toggle} aria-label={player.playing ? 'Dừng' : 'Phát'}>
             {player.playing ? '❚❚' : '►'}
           </button>
-          {multi && (
-            <button className="mp-icon-btn" onClick={player.next} aria-label="Bài sau">
-              ⏭
-            </button>
-          )}
+          <button className="mp-icon-btn" onClick={player.next} aria-label="Bài sau">
+            ⏭
+          </button>
           <span className="mp-vol">
             <span className="mp-vol-icon">🔉</span>
             <input
