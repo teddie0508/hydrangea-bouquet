@@ -28,6 +28,7 @@ body {
   min-height: 100vh;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip; /* chống tràn ngang mà không phá position:sticky */
 }
 
 #root {
@@ -42,7 +43,6 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
-  overflow: hidden;
 }
 
 /* Cánh hoa bay nền */
@@ -497,6 +497,33 @@ input[type='range'] {
   .card { padding: 22px 18px; }
   .lead { font-size: 1.4rem; }
   .template-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Mobile (iPhone): ghim khung xem bó hoa khi thiết kế ===== */
+@media (max-width: 859px) {
+  .app { align-items: flex-start; } /* nội dung dài vẫn cuộn được, không kẹt trên */
+
+  .card.design .design-head { text-align: center; }
+  .card.design .design-preview {
+    position: sticky;
+    top: 6px;
+    z-index: 5;
+    background: var(--card);
+    margin: 0 -6px 10px;
+    padding: 4px 6px 10px;
+    border-radius: 16px;
+    box-shadow: 0 10px 14px -12px rgba(80, 74, 60, 0.4);
+  }
+  .card.design .design-preview .mini-preview {
+    height: 32vh;
+    min-height: 188px;
+    margin-bottom: 0;
+    padding: 6px;
+  }
+  .card.design .design-preview .mini-preview svg {
+    height: 100%;
+    width: auto;
+  }
 }
 
 /* ===== Desktop (MacBook Air...): bố cục 2 cột cho bước Thiết kế, không cuộn ===== */
