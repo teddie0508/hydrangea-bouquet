@@ -493,6 +493,15 @@ input[type='range'] {
   font-size: 0.98rem;
 }
 
+.reveal-actions {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (max-width: 420px) {
   .card { padding: 22px 18px; }
   .lead { font-size: 1.4rem; }

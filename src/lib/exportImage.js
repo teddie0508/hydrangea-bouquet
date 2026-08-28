@@ -1,10 +1,8 @@
-// Xuất bó hoa (SVG) ra ảnh PNG khung 3:4 dọc rồi tải về.
-export async function downloadBouquetPng(
-  svgEl,
-  { fileName = 'bo-hoa.png', caption = 'Tặng Mina 🌸', subtitle = '' } = {},
-) {
-  if (!svgEl) return
+// Xuất bó hoa (SVG) ra ảnh PNG khung 3:4 dọc.
+// - iPhone/di động: mở Share sheet (bấm "Lưu ảnh" vào Ảnh).
+// - Macbook/desktop: tải thẳng file .png.
 
+async function renderBouquetBlob(svgEl, { subtitle = '', caption = '' } = {}) {
   // clone + gắn width/height để trình duyệt (nhất là Firefox) có kích thước nội tại
   const clone = svgEl.cloneNode(true)
   clone.setAttribute('width', '400')
@@ -22,7 +20,7 @@ export async function downloadBouquetPng(
   try {
     await document.fonts.ready
   } catch {
-    /* bỏ qua nếu API không có */
+    /* bỏ qua */
   }
 
   const W = 1080
@@ -32,14 +30,12 @@ export async function downloadBouquetPng(
   canvas.height = H
   const ctx = canvas.getContext('2d')
 
-  // nền kem
   const g = ctx.createLinearGradient(0, 0, 0, H)
   g.addColorStop(0, '#f7f3ec')
   g.addColorStop(1, '#eee4d2')
   ctx.fillStyle = g
   ctx.fillRect(0, 0, W, H)
 
-  // vẽ bó hoa vừa khung, chừa chỗ chữ phía dưới
   const reserve = subtitle ? 210 : 150
   const padX = 80
   const padTop = 64
@@ -52,11 +48,8 @@ export async function downloadBouquetPng(
     dh = availH
     dw = dh * aspect
   }
-  const dx = (W - dw) / 2
-  const dy = padTop
-  ctx.drawImage(img, dx, dy, dw, dh)
+  ctx.drawImage(img, (W - dw) / 2, padTop, dw, dh)
 
-  // chữ
   ctx.textAlign = 'center'
   ctx.fillStyle = '#4a4a45'
   ctx.font = '700 58px "Quicksand", "Be Vietnam Pro", sans-serif'
@@ -67,8 +60,32 @@ export async function downloadBouquetPng(
     ctx.fillText(subtitle, W / 2, H - 82)
   }
 
-  // tải về
-  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+  return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+}
+
+// Trả về: 'shared' | 'downloaded' | 'cancelled'
+export async function saveBouquetImage(
+  svgEl,
+  { fileName = 'bo-hoa.png', caption = 'Tặng Mina 🌸', subtitle = '' } = {},
+) {
+  if (!svgEl) return 'cancelled'
+  const blob = await renderBouquetBlob(svgEl, { caption, subtitle })
+  const file = new File([blob], fileName, { type: 'image/png' })
+
+  // Thiết bị cảm ứng (iPhone/iPad/Android) + hỗ trợ chia sẻ file -> dùng Share sheet
+  const isTouch =
+    typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches
+  if (isTouch && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: caption })
+      return 'shared'
+    } catch (e) {
+      if (e && e.name === 'AbortError') return 'cancelled'
+      // lỗi khác -> rơi xuống tải trực tiếp
+    }
+  }
+
+  // Desktop / không hỗ trợ chia sẻ -> tải thẳng
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -77,4 +94,5 @@ export async function downloadBouquetPng(
   a.click()
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 2000)
+  return 'downloaded'
 }

@@ -5,7 +5,7 @@ import PetalBackground from './components/PetalBackground'
 import MusicPlayer from './components/MusicPlayer'
 import { useMusicPlayer } from './hooks/useMusicPlayer'
 import { SONGS } from './lib/songs'
-import { downloadBouquetPng } from './lib/exportImage'
+import { saveBouquetImage } from './lib/exportImage'
 import {
   TEMPLATES,
   WRAPS,
@@ -436,7 +436,7 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
     if (!svg || saving) return
     setSaving(true)
     try {
-      await downloadBouquetPng(svg, {
+      await saveBouquetImage(svg, {
         fileName: 'bo-hoa-tang-mina.png',
         caption: 'Tặng Mina 🌸',
         subtitle: 'Mong Mina luôn vui và bình yên 💙',
@@ -516,15 +516,15 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
       </motion.p>
 
       <motion.div
-        className="btn-row"
+        className="btn-row reveal-actions"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
       >
-        <button className="btn" onClick={saveImage} disabled={saving}>
-          {saving ? 'Đang lưu…' : '📷 Tải ảnh về'}
+        <button className="btn block" onClick={saveImage} disabled={saving}>
+          {saving ? 'Đang lưu…' : '📷 Tải ảnh bó hoa về'}
         </button>
-        <button className="btn ghost" onClick={onRedo}>
+        <button className="btn secondary block" onClick={onRedo}>
           Làm lại bó khác
         </button>
       </motion.div>
