@@ -50,12 +50,14 @@ function stemPaths(gatherY, n = 5, fan = 15) {
   const arr = []
   for (let i = 0; i < n; i++) {
     const tx = CX + (i - (n - 1) / 2) * fan
-    arr.push(`M${CX} ${gatherY} C ${CX} ${gatherY - (gatherY - CLUSTER_TOP) * 0.5} ${tx} ${gatherY - (gatherY - CLUSTER_TOP) * 0.72} ${tx} ${CLUSTER_TOP}`)
+    arr.push(
+      `M${CX} ${gatherY} C ${CX} ${gatherY - (gatherY - CLUSTER_TOP) * 0.5} ${tx} ${gatherY - (gatherY - CLUSTER_TOP) * 0.72} ${tx} ${CLUSTER_TOP}`,
+    )
   }
   return arr
 }
 
-// Trả về cấu hình từng kiểu bó: {gatherY, back, body, front}
+// Cấu hình từng kiểu bó: {gatherY, back, body, front}
 function getWrap(wrapId) {
   switch (wrapId) {
     case 'tissue':
@@ -81,23 +83,25 @@ function getWrap(wrapId) {
       }
 
     case 'box':
+      // Hộp hoa nhỏ gọn, thanh lịch (có nơ ruy băng chữ thập)
       return {
-        gatherY: 330,
+        gatherY: 328,
         body: (
           <g>
-            <path d="M110 308 Q110 470 132 476 L268 476 Q290 470 290 308 Z" fill="url(#gBox)" />
-            <path d="M110 308 L110 470 Q110 476 118 478 L118 316 Z" fill="#ffffff" opacity="0.12" />
-            <ellipse cx="200" cy="308" rx="90" ry="18" fill="#c9bda6" />
-            <ellipse cx="200" cy="306" rx="82" ry="14" fill="#b7c0a6" />
+            <path d="M144 320 L144 420 Q144 432 158 434 L242 434 Q256 432 256 420 L256 320 Z" fill="url(#gBox)" />
+            <path d="M144 320 L144 420 Q144 430 150 432 L150 322 Z" fill="#ffffff" opacity="0.12" />
+            <ellipse cx="200" cy="320" rx="58" ry="12" fill="#c9bda6" />
+            <ellipse cx="200" cy="318" rx="50" ry="9" fill="#b7c0a6" />
           </g>
         ),
         front: (
           <g>
-            <path d="M110 308 Q200 328 290 308" stroke="#bcac90" strokeWidth="2.5" fill="none" opacity="0.7" />
-            <path d="M110 402 Q200 416 290 402 L290 420 Q200 434 110 420 Z" fill="#e6dcc4" />
-            <path d="M188 408 C 172 396 156 404 164 420 C 170 430 188 420 200 412 Z" fill="#efe6d1" />
-            <path d="M212 408 C 228 396 244 404 236 420 C 230 430 212 420 200 412 Z" fill="#efe6d1" />
-            <ellipse cx="200" cy="411" rx="7" ry="7" fill="#dccca9" />
+            <path d="M144 320 Q200 336 256 320" stroke="#bcac90" strokeWidth="2" fill="none" opacity="0.6" />
+            <rect x="193" y="320" width="14" height="114" fill="#e7dcc4" />
+            <rect x="144" y="366" width="112" height="14" fill="#e7dcc4" />
+            <path d="M200 366 C 184 356 170 362 177 376 C 183 384 197 376 200 370 Z" fill="#efe6d1" />
+            <path d="M200 366 C 216 356 230 362 223 376 C 217 384 203 376 200 370 Z" fill="#efe6d1" />
+            <ellipse cx="200" cy="369" rx="6" ry="6" fill="#dccca9" />
           </g>
         ),
       }
@@ -105,7 +109,6 @@ function getWrap(wrapId) {
     case 'vase':
       return {
         gatherY: 462,
-        overStems: true, // thân bình vẽ ĐÈ lên cuống (kính trong)
         body: (
           <g>
             <path d="M151 432 Q156 494 200 499 Q244 494 249 432 Q200 448 151 432 Z" fill="#bcd2de" opacity="0.6" />
@@ -155,26 +158,6 @@ function getWrap(wrapId) {
         front: <path d="M112 322 Q200 340 288 322" stroke="#a9895a" strokeWidth="2.5" fill="none" opacity="0.6" />,
       }
 
-    case 'bag':
-      return {
-        gatherY: 384,
-        back: (
-          <g>
-            <path d="M150 306 Q170 248 198 306" fill="none" stroke="#c9b184" strokeWidth="5" strokeLinecap="round" />
-            <path d="M202 306 Q230 248 250 306" fill="none" stroke="#c9b184" strokeWidth="5" strokeLinecap="round" />
-          </g>
-        ),
-        body: (
-          <g>
-            <path d="M124 302 L276 302 L268 500 Q200 512 132 500 Z" fill="url(#gBag)" />
-            <path d="M124 302 L276 302 L276 320 Q200 332 124 320 Z" fill="#c9b184" opacity="0.55" />
-            <path d="M200 302 L200 506" stroke="#bd9f6d" strokeWidth="1" opacity="0.4" />
-            <path d="M124 302 L132 500 Q120 490 118 470 L124 320 Z" fill="#ffffff" opacity="0.12" />
-          </g>
-        ),
-        front: null,
-      }
-
     case 'kraft':
     default:
       return {
@@ -202,64 +185,132 @@ function getWrap(wrapId) {
   }
 }
 
+// Túi giấy có ô cửa sổ nhìn thấy bó hoa bên trong (kiểu ảnh mẫu)
+function BagLayout({ heads, palette }) {
+  // Bó hoa thu nhỏ, đặt trong ô cửa sổ
+  const inner = 'translate(100 250) scale(0.5)'
+  const wrapGreen = palette && palette.length ? shade('#c3d385', 0) : '#c3d385'
+  return (
+    <>
+      {/* Tấm sau trong túi */}
+      <path d="M74 172 L326 172 L318 526 Q200 540 82 526 Z" fill="#ece3d4" />
+
+      {/* Giấy Hàn xanh + bó hoa nhỏ trong cửa sổ */}
+      <path d="M156 356 Q160 420 200 456 Q240 420 244 356 Q200 392 156 356 Z" fill={wrapGreen} />
+      <path d="M158 352 Q160 360 200 372 Q240 360 242 352 Q200 372 158 352 Z" fill="#d6e2a2" opacity="0.7" />
+      <g transform={inner}>
+        {heads.map((h, i) => (
+          <g key={i}>
+            {h.florets.map((f, j) => (
+              <Floret key={j} f={f} />
+            ))}
+          </g>
+        ))}
+      </g>
+      {/* nơ nhỏ ở cổ bó trong túi */}
+      <path d="M200 452 C 186 444 174 450 180 462 C 185 469 196 462 200 457 Z" fill="#fbf7ef" />
+      <path d="M200 452 C 214 444 226 450 220 462 C 215 469 204 462 200 457 Z" fill="#fbf7ef" />
+      <ellipse cx="200" cy="454" rx="5" ry="5" fill="#eee7d8" />
+
+      {/* Mặt trước túi (có khoét cửa sổ bằng mask) */}
+      <g mask="url(#bagWindow)">
+        <path d="M70 168 L330 168 L322 528 Q200 542 78 528 Z" fill="#f7f3ec" />
+        <path d="M70 168 L96 150 L112 172 Z" fill="#eee6d8" />
+        <path d="M330 168 L304 150 L288 172 Z" fill="#eee6d8" />
+        <path d="M78 528 Q200 542 322 528 L322 512 Q200 526 78 512 Z" fill="#ece3d3" opacity="0.7" />
+        <path d="M70 168 L78 528 Q70 520 68 500 L64 190 Z" fill="#ffffff" opacity="0.5" />
+      </g>
+      {/* viền cửa sổ */}
+      <rect x="118" y="250" width="164" height="216" rx="16" fill="none" stroke="#e5ddce" strokeWidth="2" />
+
+      {/* Quai dây xoắn */}
+      {[[138, 198], [202, 262]].map(([x1, x2], i) => (
+        <g key={i}>
+          <path d={`M${x1} 168 C ${x1 + 8} 86 ${x2 - 8} 86 ${x2} 168`} fill="none" stroke="#93a6b8" strokeWidth="3.5" strokeLinecap="round" />
+          <path d={`M${x1} 168 C ${x1 + 8} 86 ${x2 - 8} 86 ${x2} 168`} fill="none" stroke="#ffffff" strokeWidth="1.3" strokeDasharray="3 3.5" opacity="0.85" />
+        </g>
+      ))}
+
+      {/* Thẻ tag */}
+      <line x1="250" y1="176" x2="264" y2="210" stroke="#c9b184" strokeWidth="1" />
+      <g transform="rotate(9 264 226)">
+        <rect x="244" y="210" width="42" height="30" rx="4" fill="#fbf8f2" stroke="#e6ddcd" />
+        <line x1="250" y1="220" x2="280" y2="220" stroke="#d8cdb8" strokeWidth="1.3" />
+        <line x1="250" y1="226" x2="276" y2="226" stroke="#e0d7c4" strokeWidth="1.1" />
+        <line x1="250" y1="232" x2="278" y2="232" stroke="#e0d7c4" strokeWidth="1.1" />
+      </g>
+    </>
+  )
+}
+
 export default function Bouquet({ templateId, wrapId = 'kraft', palette, params, seed, className, style }) {
   const { heads, eucalyptus } = useMemo(
     () => buildBouquet({ templateId, palette, params, seed }),
     [templateId, palette, params, seed],
   )
 
-  const wrap = getWrap(wrapId)
-  const stems = stemPaths(wrap.gatherY, 5, wrapId === 'vase' ? 10 : 15)
-  const stemsEl = (
-    <g stroke="#7f9b6e" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.9">
-      {stems.map((d, i) => (
-        <path key={i} d={d} />
-      ))}
-    </g>
+  const commonDefs = (
+    <defs>
+      <radialGradient id="headGlow" cx="0.5" cy="0.4" r="0.7">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+        <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+      </radialGradient>
+      <linearGradient id="gKraft" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#e4d4b6" />
+        <stop offset="100%" stopColor="#cdb489" />
+      </linearGradient>
+      <linearGradient id="gBox" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#ddd0bb" />
+        <stop offset="100%" stopColor="#c7b89f" />
+      </linearGradient>
+      <linearGradient id="gBasket" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="#d6b783" />
+        <stop offset="100%" stopColor="#bd9a63" />
+      </linearGradient>
+      <mask id="bagWindow">
+        <rect x="0" y="0" width={CANVAS.w} height={CANVAS.h} fill="white" />
+        <rect x="118" y="250" width="164" height="216" rx="16" fill="black" />
+      </mask>
+    </defs>
   )
 
-  return (
-    <svg
-      viewBox={`0 0 ${CANVAS.w} ${CANVAS.h}`}
-      className={className}
-      style={style}
-      xmlns="http://www.w3.org/2000/svg"
-      role="img"
-      aria-label="Bó hoa cẩm tú cầu"
-    >
-      <defs>
-        <radialGradient id="headGlow" cx="0.5" cy="0.4" r="0.7">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id="gKraft" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e4d4b6" />
-          <stop offset="100%" stopColor="#cdb489" />
-        </linearGradient>
-        <linearGradient id="gBox" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ddd0bb" />
-          <stop offset="100%" stopColor="#c7b89f" />
-        </linearGradient>
-        <linearGradient id="gBasket" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#d6b783" />
-          <stop offset="100%" stopColor="#bd9a63" />
-        </linearGradient>
-        <linearGradient id="gBag" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#e0cda3" />
-          <stop offset="100%" stopColor="#cbb583" />
-        </linearGradient>
-      </defs>
+  const svgProps = {
+    viewBox: `0 0 ${CANVAS.w} ${CANVAS.h}`,
+    className,
+    style,
+    xmlns: 'http://www.w3.org/2000/svg',
+    role: 'img',
+    'aria-label': 'Bó hoa cẩm tú cầu',
+  }
 
-      {/* Lớp sau cùng của kiểu bó (quai giỏ/túi, voan sau...) */}
+  if (wrapId === 'bag') {
+    return (
+      <svg {...svgProps}>
+        {commonDefs}
+        <BagLayout heads={heads} palette={palette} />
+      </svg>
+    )
+  }
+
+  const wrap = getWrap(wrapId)
+  const stems = stemPaths(wrap.gatherY, 5, wrapId === 'vase' ? 10 : 15)
+
+  return (
+    <svg {...svgProps}>
+      {commonDefs}
+
       {wrap.back}
 
-      {/* Khuynh diệp nhô sau hoa */}
       {eucalyptus.sprigs.map((s, i) => (
         <Sprig key={`sprig-${i}`} s={s} />
       ))}
 
-      {/* Cuống vẽ trước, thân bó (giấy/hộp/kính...) phủ lên che gốc cuống */}
-      {stemsEl}
+      {/* Cuống vẽ trước, thân bó phủ lên che gốc cuống */}
+      <g stroke="#7f9b6e" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.9">
+        {stems.map((d, i) => (
+          <path key={i} d={d} />
+        ))}
+      </g>
       {wrap.body}
 
       {/* Các đầu bông */}
@@ -272,7 +323,6 @@ export default function Bouquet({ templateId, wrapId = 'kraft', palette, params,
         </g>
       ))}
 
-      {/* Lớp trước của kiểu bó (nơ, vành trước, ánh kính...) */}
       {wrap.front}
     </svg>
   )

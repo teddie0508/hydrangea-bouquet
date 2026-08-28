@@ -485,3 +485,42 @@ input[type='range'] {
   .lead { font-size: 1.4rem; }
   .template-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ===== Desktop (MacBook Air...): bố cục 2 cột cho bước Thiết kế, không cuộn ===== */
+@media (min-width: 860px) {
+  .app { padding-top: 12px; padding-bottom: 12px; }
+  .progress { margin-bottom: 12px; }
+
+  .stage:has(.card.design) { max-width: 920px; }
+
+  .card.design {
+    display: grid;
+    grid-template-columns: 296px 1fr;
+    grid-template-areas: 'head head' 'preview controls';
+    column-gap: 28px;
+    row-gap: 4px;
+    padding: 16px 26px 18px;
+  }
+  .card.design .step-title { font-size: 1.2rem; }
+  .card.design .step-desc { margin-bottom: 0; }
+  .design-head { grid-area: head; }
+  .design-preview { grid-area: preview; align-self: center; }
+  .design-preview .mini-preview { margin-bottom: 0; padding: 8px; }
+  .design-preview .mini-preview svg { height: 340px; }
+  .design-controls { grid-area: controls; min-width: 0; }
+
+  /* thu gọn để vừa 1 màn hình, khỏi cuộn */
+  .card.design .section-label { margin: 0 0 5px; }
+  .card.design .template-grid { gap: 7px; margin-bottom: 8px; }
+  .card.design .template-card { padding: 4px 4px 5px; border-radius: 12px; }
+  .card.design .template-card svg { height: 40px; }
+  .card.design .template-card b { font-size: 0.76rem; margin-top: 1px; }
+  .card.design .template-card small { display: none; }
+  .card.design .slider-row { margin-bottom: 5px; }
+  .card.design .slider-row label { font-size: 0.82rem; margin-bottom: 2px; }
+  .design-actions { margin-top: 10px; }
+  .design-actions .btn { padding: 10px 18px; }
+
+  /* Chọn màu: xếp 2 cột cho gọn khi nhiều màu */
+  .color-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+}

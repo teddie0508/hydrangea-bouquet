@@ -30,7 +30,7 @@ export default function App() {
 
 function PreviewGrid() {
   const pal = DEFAULT_PALETTE
-  const p = { blooms: 4, density: 9, spread: 0.6 }
+  const p = { blooms: 5, density: 20, spread: 0.6 }
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16, background: '#f3efe6' }}>
       {WRAPS.map((w) => (
@@ -44,7 +44,11 @@ function PreviewGrid() {
 }
 
 function MainApp() {
-  const [step, setStep] = useState(1)
+  const initialStep =
+    typeof window !== 'undefined'
+      ? Number(new URLSearchParams(window.location.search).get('step')) || 1
+      : 1
+  const [step, setStep] = useState(initialStep)
   const [palette, setPalette] = useState(DEFAULT_PALETTE)
   const [templateId, setTemplateId] = useState('round')
   const [wrapId, setWrapId] = useState('kraft')
@@ -256,20 +260,25 @@ function StepDesign({
     setParams((p) => ({ ...p, [key]: val }))
 
   return (
-    <div className="card">
-      <p className="step-title">Thiết kế bó hoa 💐</p>
-      <p className="step-desc">Chọn kiểu bó, dáng hoa, rồi tinh chỉnh cho vừa ý.</p>
-
-      <div className="mini-preview">
-        <Bouquet
-          templateId={templateId}
-          wrapId={wrapId}
-          palette={palette}
-          params={params}
-          seed={seed}
-        />
+    <div className="card design">
+      <div className="design-head">
+        <p className="step-title">Thiết kế bó hoa 💐</p>
+        <p className="step-desc">Chọn kiểu bó, dáng hoa, rồi tinh chỉnh cho vừa ý.</p>
       </div>
 
+      <div className="design-preview">
+        <div className="mini-preview">
+          <Bouquet
+            templateId={templateId}
+            wrapId={wrapId}
+            palette={palette}
+            params={params}
+            seed={seed}
+          />
+        </div>
+      </div>
+
+      <div className="design-controls">
       <p className="section-label">Kiểu bó</p>
       <div className="template-grid">
         {WRAPS.map((w) => (
@@ -354,19 +363,17 @@ function StepDesign({
         />
       </div>
 
-      <div className="btn-row" style={{ justifyContent: 'center', marginTop: 8 }}>
-        <button className="btn ghost" onClick={reroll}>
-          ↻ Xáo lại thế hoa
-        </button>
-      </div>
-
-      <div className="btn-row">
+      <div className="btn-row design-actions">
         <button className="btn ghost" onClick={onBack}>
           ← Đổi màu
+        </button>
+        <button className="btn ghost" onClick={reroll}>
+          ↻ Xáo hoa
         </button>
         <button className="btn" onClick={onNext}>
           Xong! →
         </button>
+      </div>
       </div>
     </div>
   )
