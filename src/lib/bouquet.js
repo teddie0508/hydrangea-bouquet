@@ -89,55 +89,58 @@ function heartPositions(n, scale, rng) {
 }
 
 // Trả về danh sách đầu bông quanh gốc (0,0). Sẽ được fit vào khung sau.
+// Độ xòe (spread) điều khiển ĐỘ THƯA giữa các bông (kích thước bông giữ cố định),
+// nhờ đó xòe nhỏ = cụm dày khít, xòe lớn = cụm thoáng, rời.
 function makeHeads(templateId, params, rng) {
   const { blooms, spread } = params
-  const s = 0.8 + spread * 0.55 // độ xòe tương đối
+  const R = templateId === 'petite' ? 42 : 48 // bán kính đầu bông (cố định)
+  const sp = R * (0.95 + spread * 1.7) // bán kính giãn cách của cụm
   let raw = []
 
   switch (templateId) {
     case 'cascade': {
       const top = Math.max(1, Math.round(blooms * 0.62))
       const tail = blooms - top
-      raw = domePositions(top, 120 * s, 92 * s, rng)
+      raw = domePositions(top, sp, sp * 0.82, rng)
       for (let i = 0; i < tail; i++) {
         const p = (i + 1) / (tail + 1)
         raw.push({
-          x: -30 * s + (rng() - 0.5) * 60 * s,
-          y: 90 + p * 150 * s,
+          x: -sp * 0.32 + (rng() - 0.5) * sp * 0.55,
+          y: sp * 0.7 + p * sp * 1.6,
           depth: 0.5 + p * 0.4,
         })
       }
       break
     }
     case 'heart':
-      raw = heartPositions(blooms, 9 * s, rng)
+      raw = heartPositions(blooms, sp / 14, rng)
       break
     case 'asymmetric':
-      raw = domePositions(blooms, 132 * s, 88 * s, rng).map((p) => ({
+      raw = domePositions(blooms, sp * 1.05, sp * 0.72, rng).map((p) => ({
         ...p,
-        x: p.x + p.y * 0.22 + 12 * s,
+        x: p.x + p.y * 0.22 + R * 0.2,
       }))
       break
     case 'petite':
-      raw = domePositions(blooms, 84 * s, 74 * s, rng)
+      raw = domePositions(blooms, sp * 0.74, sp * 0.66, rng)
       break
     case 'round':
     default:
-      raw = domePositions(blooms, 120 * s, 110 * s, rng)
+      raw = domePositions(blooms, sp, sp * 0.92, rng)
       break
   }
 
-  const baseR = (templateId === 'petite' ? 46 : 52) * s
   return raw.map((p) => ({
     x: p.x,
     y: p.y,
-    r: baseR * (0.82 + rng() * 0.32),
+    r: R * (0.82 + rng() * 0.3),
     depth: p.depth ?? 0.5,
   }))
 }
 
-// Co giãn + dời cụm hoa cho vừa khung an toàn, neo đáy cụm vào chỗ cuống.
-function fitHeads(heads) {
+// Co giãn + dời cụm hoa cho vừa khung, neo đáy cụm vào chỗ cuống.
+// Độ xòe quyết định cụm chiếm bao nhiêu phần khung (fill), fit chỉ để chống tràn.
+function fitHeads(heads, spread) {
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
   for (const h of heads) {
     minX = Math.min(minX, h.x - h.r)
@@ -147,9 +150,10 @@ function fitHeads(heads) {
   }
   const w = Math.max(1, maxX - minX)
   const hgt = Math.max(1, maxY - minY)
-  const targetH = CLUSTER_BOX.bottom - CLUSTER_BOX.top
-  // fit vừa khung, không phóng quá to (để độ xòe nhỏ vẫn nhỏ gọn)
-  const scale = Math.min(CLUSTER_BOX.w / w, targetH / hgt, 1.25)
+  const boxH = CLUSTER_BOX.bottom - CLUSTER_BOX.top
+  const fill = 0.56 + 0.44 * spread // xòe nhỏ -> 56% khung, xòe lớn -> đầy khung
+  let scale = Math.min((CLUSTER_BOX.w * fill) / w, (boxH * fill) / hgt)
+  scale = Math.min(scale, CLUSTER_BOX.w / w, boxH / hgt) // không bao giờ vượt khung
   const cx = (minX + maxX) / 2
   return heads.map((h) => ({
     ...h,
@@ -251,7 +255,7 @@ function clamp(v, lo, hi) {
 export function buildBouquet({ templateId, palette, params, seed }) {
   const rng = mulberry32(seed || 1)
   let heads = makeHeads(templateId, params, rng)
-  heads = fitHeads(heads)
+  heads = fitHeads(heads, params.spread)
   const gDir = (() => {
     const a = rng() * Math.PI * 2
     return { x: Math.cos(a), y: Math.sin(a) }
