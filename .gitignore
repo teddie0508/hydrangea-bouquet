@@ -1,0 +1,13 @@
+node_modules
+# file nhạc gốc ở thư mục gốc (bản dùng thật đã copy sang public/music.mp3)
+love is - drt.mp3
+dist
+dist-ssr
+*.local
+.vercel
+.DS_Store
+.env
+.env.*
+logs
+*.log
+npm-debug.log*
