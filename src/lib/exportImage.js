@@ -3,6 +3,7 @@
 // - Macbook/desktop: tải thẳng file .png.
 
 async function renderBouquetBlob(svgEl, { subtitle = '', caption = '' } = {}) {
+  const hasText = Boolean(caption || subtitle)
   // clone + gắn width/height để trình duyệt (nhất là Firefox) có kích thước nội tại
   const clone = svgEl.cloneNode(true)
   clone.setAttribute('width', '400')
@@ -36,11 +37,11 @@ async function renderBouquetBlob(svgEl, { subtitle = '', caption = '' } = {}) {
   ctx.fillStyle = g
   ctx.fillRect(0, 0, W, H)
 
-  const reserve = subtitle ? 210 : 150
   const padX = 80
-  const padTop = 64
+  const bottomReserve = hasText ? (subtitle ? 210 : 150) : 90
+  const padTop = hasText ? 64 : 90
   const availW = W - 2 * padX
-  const availH = H - padTop - reserve
+  const availH = H - padTop - bottomReserve
   const aspect = 400 / 560
   let dw = availW
   let dh = dw / aspect
@@ -48,16 +49,20 @@ async function renderBouquetBlob(svgEl, { subtitle = '', caption = '' } = {}) {
     dh = availH
     dw = dh * aspect
   }
-  ctx.drawImage(img, (W - dw) / 2, padTop, dw, dh)
+  // không có chữ -> căn giữa theo chiều dọc cả khung
+  const dy = hasText ? padTop : (H - dh) / 2
+  ctx.drawImage(img, (W - dw) / 2, dy, dw, dh)
 
-  ctx.textAlign = 'center'
-  ctx.fillStyle = '#4a4a45'
-  ctx.font = '700 58px "Quicksand", "Be Vietnam Pro", sans-serif'
-  ctx.fillText(caption, W / 2, H - (subtitle ? 132 : 92))
-  if (subtitle) {
-    ctx.fillStyle = '#7d7a70'
-    ctx.font = '400 31px "Be Vietnam Pro", sans-serif'
-    ctx.fillText(subtitle, W / 2, H - 82)
+  if (hasText) {
+    ctx.textAlign = 'center'
+    ctx.fillStyle = '#4a4a45'
+    ctx.font = '700 58px "Quicksand", "Be Vietnam Pro", sans-serif'
+    ctx.fillText(caption, W / 2, H - (subtitle ? 132 : 92))
+    if (subtitle) {
+      ctx.fillStyle = '#7d7a70'
+      ctx.font = '400 31px "Be Vietnam Pro", sans-serif'
+      ctx.fillText(subtitle, W / 2, H - 82)
+    }
   }
 
   return await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
@@ -66,7 +71,7 @@ async function renderBouquetBlob(svgEl, { subtitle = '', caption = '' } = {}) {
 // Trả về: 'shared' | 'downloaded' | 'cancelled'
 export async function saveBouquetImage(
   svgEl,
-  { fileName = 'bo-hoa.png', caption = 'Tặng Mina 🌸', subtitle = '' } = {},
+  { fileName = 'bo-hoa.png', caption = '', subtitle = '' } = {},
 ) {
   if (!svgEl) return 'cancelled'
   const blob = await renderBouquetBlob(svgEl, { caption, subtitle })

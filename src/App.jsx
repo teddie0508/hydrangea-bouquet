@@ -436,11 +436,7 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
     if (!svg || saving) return
     setSaving(true)
     try {
-      await saveBouquetImage(svg, {
-        fileName: 'bo-hoa-tang-mina.png',
-        caption: 'Tặng Mina 🌸',
-        subtitle: 'Mong Mina luôn vui và bình yên 💙',
-      })
+      await saveBouquetImage(svg, { fileName: 'bo-hoa-tang-mina.png' })
     } catch (e) {
       console.error('Không xuất được ảnh:', e)
     }
