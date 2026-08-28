@@ -129,17 +129,11 @@ h3 {
 }
 
 .sticker-slot {
-  width: 130px;
-  height: 130px;
-  margin: 6px auto 18px;
-  border-radius: 20px;
-  border: 2px dashed var(--line);
+  width: 150px;
+  height: 150px;
+  margin: 2px auto 14px;
   display: grid;
   place-items: center;
-  color: #c3bcae;
-  font-size: 0.78rem;
-  text-align: center;
-  background: var(--bg-soft);
   overflow: hidden;
 }
 

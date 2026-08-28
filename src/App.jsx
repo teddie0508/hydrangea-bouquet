@@ -145,14 +145,12 @@ function StepIntro({ player, onNext }) {
   return (
     <div className="card center">
       <div className="sticker-slot" aria-hidden>
-        (ảnh sticker
-        <br />
-        thêm sau 🌸)
+        <img src="/stickers/1.gif" alt="" />
       </div>
-      <p className="lead">Xin chào Mina 👋</p>
+      <p className="lead">hé lu mina =))</p>
       <p className="sub">
-        Tớ thấy Mina rất thích hoa cẩm tú cầu, thế nên hôm nay tớ muốn tặng cho
-        Mina một món quà nhỏ. Sang bước tiếp theo để biết đó là gì nhé!
+        tớ thấy mina có vẻ rất thích hoa cẩm tú cầu, thế nên hôm nay tớ muốn tặng cho
+        mina một món quà nhỏ. Sang bước tiếp theo để biết đó là gì nhóee
       </p>
 
       <div className="btn-row">
@@ -161,12 +159,12 @@ function StepIntro({ player, onNext }) {
           onClick={player.toggle}
         >
           <span className="dot" />
-          {player.playing ? 'Đang phát nhạc' : 'Bật nhạc nghe nhé'}
+          {player.playing ? 'Đang phát nhạc' : 'Bật nhạc nghe nha'}
         </button>
       </div>
       <p className="note">
-        Nếu cậu muốn làm nó cùng một tâm trạng vui vẻ hơn, bấm nút trên để nghe
-        nhạc nha 🎵
+        nếu mina muốn làm nó cùng một tâm trạng vui vẻ hơn, bấm nút trên để nghe
+        nhạc nha!
       </p>
 
       <div className="btn-row">
@@ -287,7 +285,7 @@ function StepDesign({
   return (
     <div className="card design">
       <div className="design-head">
-        <p className="step-title">Thiết kế bó hoa 💐</p>
+        <p className="step-title">Thiết kế bó hoa ^^</p>
         <p className="step-desc">Chọn kiểu bó, dáng hoa, rồi tinh chỉnh cho vừa ý.</p>
       </div>
 
@@ -409,17 +407,15 @@ function StepConfirm({ onReady, onRedo }) {
   return (
     <div className="card center">
       <div className="sticker-slot" aria-hidden>
-        (ảnh sticker
-        <br />
-        thêm sau 💕)
+        <img src="/stickers/2.gif" alt="" />
       </div>
-      <p className="lead">Mina iu đã sẵn sàng để đón nhận món quà này chưa?</p>
+      <p className="lead">naiuoyy đã sẵn sàng để đón nhận món quà này chưa nhò ?</p>
       <div className="btn-row">
         <button className="btn block" onClick={onReady}>
-          Sẵn sàng!!! 🎁
+          Sẵn sàng!!!
         </button>
         <button className="btn secondary block" onClick={onRedo}>
-          Mina muốn chọn lại màu và thiết kế
+          mina muốn chọn lại màu và thiết kế...
         </button>
       </div>
     </div>
@@ -500,7 +496,7 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9 }}
       >
-        Tặng Mina 🌸
+        món quà dành cho mina ngố 💐 
       </motion.p>
       <motion.p
         className="reveal-sub"
@@ -508,7 +504,7 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        Mong Mina luôn vui và bình yên như những đóa hoa này 💙
+        mong Mina luôn rực rỡ và tươi tắn như những đóa hoa này 💙
       </motion.p>
 
       <motion.div
@@ -518,10 +514,10 @@ function StepReveal({ templateId, wrapId, palette, params, seed, onRedo }) {
         transition={{ delay: 1.5 }}
       >
         <button className="btn block" onClick={saveImage} disabled={saving}>
-          {saving ? 'Đang lưu…' : '📷 Tải ảnh bó hoa về'}
+          {saving ? 'Đang lưu…' : 'mina muốn tải ảnh bó hoa về'}
         </button>
         <button className="btn secondary block" onClick={onRedo}>
-          Làm lại bó khác
+          mina muốn làm lại bó khác
         </button>
       </motion.div>
     </div>
