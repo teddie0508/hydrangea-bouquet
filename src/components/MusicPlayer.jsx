@@ -10,7 +10,7 @@ export default function MusicPlayer({ player, songs }) {
   const multi = songs.length > 1
 
   return (
-    <div className="music-player">
+    <div className={`music-player ${player.started ? 'shown' : ''}`}>
       <button
         className={`mp-fab ${player.playing ? 'playing' : ''}`}
         onClick={() => setOpen((o) => !o)}

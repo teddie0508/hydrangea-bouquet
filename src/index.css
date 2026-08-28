@@ -572,6 +572,17 @@ input[type='range'] {
   right: 14px;
   z-index: 60;
   font-family: 'Be Vietnam Pro', sans-serif;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 3s ease, transform 3s ease;
+}
+
+/* Fade in ~3s khi người dùng bật nhạc lần đầu */
+.music-player.shown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .mp-fab {
