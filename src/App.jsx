@@ -30,6 +30,19 @@ export default function App() {
 
 function PreviewGrid() {
   const pal = DEFAULT_PALETTE
+  const mode = new URLSearchParams(window.location.search).get('grid')
+  if (mode === 'blooms') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16, background: '#f3efe6' }}>
+        {[3, 5, 7, 9].map((b) => (
+          <div key={b} style={{ width: 200, background: '#fff', borderRadius: 16, padding: 8, textAlign: 'center' }}>
+            <Bouquet templateId="round" wrapId="kraft" palette={pal} params={{ blooms: b, density: 22, spread: 0.6 }} seed={7} style={{ height: 280 }} />
+            <b>{b} bông</b>
+          </div>
+        ))}
+      </div>
+    )
+  }
   const p = { blooms: 5, density: 20, spread: 0.6 }
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: 16, background: '#f3efe6' }}>
