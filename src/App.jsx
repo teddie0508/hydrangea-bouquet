@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Bouquet from './components/Bouquet'
 import PetalBackground from './components/PetalBackground'
@@ -163,10 +163,19 @@ function StepIntro({ music, onNext }) {
 
 /* ---------- Bước 2: Chọn màu ---------- */
 function StepColors({ palette, setPalette, onBack, onNext }) {
+  const [maxNote, setMaxNote] = useState(false)
+  const noteTimer = useRef(null)
   const setAt = (i, val) =>
     setPalette((p) => p.map((c, idx) => (idx === i ? val : c)))
-  const add = () =>
-    palette.length < MAX_COLORS && setPalette((p) => [...p, '#c9c3b6'])
+  const add = () => {
+    if (palette.length >= MAX_COLORS) {
+      setMaxNote(true)
+      clearTimeout(noteTimer.current)
+      noteTimer.current = setTimeout(() => setMaxNote(false), 3200)
+      return
+    }
+    setPalette((p) => [...p, '#c9c3b6'])
+  }
   const remove = (i) =>
     palette.length > MIN_COLORS &&
     setPalette((p) => p.filter((_, idx) => idx !== i))
@@ -220,14 +229,13 @@ function StepColors({ palette, setPalette, onBack, onNext }) {
         ))}
       </div>
 
-      <div className="btn-row" style={{ justifyContent: 'flex-start', marginTop: 14 }}>
-        <button
-          className="btn secondary"
-          onClick={add}
-          disabled={palette.length >= MAX_COLORS}
-        >
+      <div className="btn-row" style={{ justifyContent: 'flex-start', marginTop: 14, gap: 10 }}>
+        <button className="btn secondary" onClick={add}>
           + Thêm màu
         </button>
+        {maxNote && (
+          <span className="max-note">khả năng của tớ chỉ dừng lại ở 6 màu thui =)))</span>
+        )}
       </div>
 
       <div className="btn-row">

@@ -370,6 +370,19 @@ h3 {
   color: var(--ink-soft);
 }
 
+.max-note {
+  font-size: 0.82rem;
+  color: #a4907a;
+  align-self: center;
+  line-height: 1.35;
+  animation: fadeInNote 0.28s ease;
+}
+
+@keyframes fadeInNote {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .section-label {
   font-size: 0.82rem;
   font-weight: 600;

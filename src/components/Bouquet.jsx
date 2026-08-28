@@ -45,16 +45,26 @@ function Sprig({ s }) {
   )
 }
 
-// Cuống hoa: toả từ điểm tụ lên đáy cụm
-function stemPaths(gatherY, n = 5, fan = 15) {
-  const arr = []
-  for (let i = 0; i < n; i++) {
-    const tx = CX + (i - (n - 1) / 2) * fan
-    arr.push(
-      `M${CX} ${gatherY} C ${CX} ${gatherY - (gatherY - CLUSTER_TOP) * 0.5} ${tx} ${gatherY - (gatherY - CLUSTER_TOP) * 0.72} ${tx} ${CLUSTER_TOP}`,
-    )
+// Cuống hoa: toả từ điểm tụ (cổ bó) lên BÁM VÀO các bông thấp nhất của cụm,
+// nhờ đó xòe càng cao cuống càng vươn dài theo hoa, không bị hụt.
+function stemPathsTo(gatherY, heads) {
+  if (!heads.length) return []
+  const sorted = [...heads].sort((a, b) => b.y - a.y) // thấp nhất trước
+  const lowY = sorted[0].y
+  // chỉ bám các bông ở rìa đáy (trong khoảng 60px tính từ bông thấp nhất)
+  let targets = sorted
+    .filter((h) => h.y >= lowY - 60)
+    .slice(0, 5)
+    .map((h) => ({ x: h.x, y: h.y }))
+  // đảm bảo có ít nhất 3 cuống cho đầy đặn
+  while (targets.length < 3) {
+    const base = targets[0] || { x: CX, y: CLUSTER_TOP }
+    targets.push({ x: base.x + (targets.length - 1) * 14 - 7, y: base.y + 4 })
   }
-  return arr
+  return targets.map((t) => {
+    const midY = gatherY + (t.y - gatherY) * 0.42
+    return `M${CX} ${gatherY} C ${CX} ${midY} ${t.x} ${(t.y + gatherY) / 2} ${t.x} ${t.y}`
+  })
 }
 
 // Cấu hình từng kiểu bó: {gatherY, back, body, front}
@@ -65,19 +75,24 @@ function getWrap(wrapId) {
         gatherY: 388,
         body: (
           <g>
-            <path d="M108 298 Q150 358 172 388 L228 388 Q250 358 292 298 Q200 346 108 298 Z" fill="#f4eee3" />
-            <path d="M200 388 L182 512 Q200 520 218 512 Z" fill="#ece3d2" />
-            <path d="M120 300 Q120 356 168 386 Q150 342 196 322 Q150 302 120 300 Z" fill="#ffffff" opacity="0.45" />
-            <path d="M280 300 Q280 356 232 386 Q250 342 204 322 Q250 302 280 300 Z" fill="#ffffff" opacity="0.45" />
-            <path d="M150 290 Q150 350 190 384 Q188 334 208 318 Q176 298 150 290 Z" fill="#ffffff" opacity="0.35" />
-            <path d="M250 290 Q250 350 210 384 Q212 334 192 318 Q224 298 250 290 Z" fill="#ffffff" opacity="0.35" />
+            {/* bóng đổ nhẹ để tách khỏi nền */}
+            <path d="M112 302 Q150 360 172 388 L228 388 Q250 360 292 302 Q200 350 112 302 Z" fill="#c7b592" opacity="0.3" />
+            {/* lớp giấy nền (có viền) */}
+            <path d="M110 298 Q150 358 172 388 L228 388 Q250 358 290 298 Q200 346 110 298 Z" fill="#efe4cf" stroke="#d6c6a8" strokeWidth="1.2" />
+            <path d="M200 388 L184 512 Q200 520 216 512 Z" fill="#e4d7bd" stroke="#d6c6a8" strokeWidth="0.8" />
+            {/* tờ giấy bồng, có viền để nổi trên nền */}
+            <path d="M120 300 Q116 356 168 386 Q150 342 198 322 Q150 302 120 300 Z" fill="#fbf6ec" stroke="#e2d8c3" strokeWidth="1" />
+            <path d="M280 300 Q284 356 232 386 Q250 342 202 322 Q250 302 280 300 Z" fill="#fbf6ec" stroke="#e2d8c3" strokeWidth="1" />
+            {/* điểm nhấn xanh-xám nhạt cho tách nền, hợp gu */}
+            <path d="M150 292 Q148 350 190 384 Q188 334 208 318 Q176 298 150 292 Z" fill="#e6edf1" opacity="0.9" stroke="#cfd9e0" strokeWidth="0.9" />
+            <path d="M250 292 Q252 350 210 384 Q212 334 192 318 Q224 298 250 292 Z" fill="#e6edf1" opacity="0.9" stroke="#cfd9e0" strokeWidth="0.9" />
           </g>
         ),
         front: (
           <g>
-            <path d="M193 392 C 189 424 187 442 182 466" stroke="#e0d3b7" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <path d="M207 392 C 211 424 213 442 218 466" stroke="#e0d3b7" strokeWidth="4" fill="none" strokeLinecap="round" />
-            <ellipse cx="200" cy="391" rx="7" ry="7" fill="#e7dcc4" />
+            <path d="M193 392 C 189 424 187 442 182 466" stroke="#d7c6a5" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <path d="M207 392 C 211 424 213 442 218 466" stroke="#d7c6a5" strokeWidth="4" fill="none" strokeLinecap="round" />
+            <ellipse cx="200" cy="391" rx="7" ry="7" fill="#e0d4ba" />
           </g>
         ),
       }
@@ -130,32 +145,54 @@ function getWrap(wrapId) {
       }
 
     case 'basket':
+      // Giỏ mây đan nan ngang, vành cuộn, tai cầm hai bên
       return {
-        gatherY: 345,
-        back: (
-          <g>
-            <path d="M120 322 Q200 210 280 322" fill="none" stroke="#c2a06e" strokeWidth="9" strokeLinecap="round" />
-            <path d="M120 322 Q200 214 280 322" fill="none" stroke="#d8bd8f" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
-          </g>
-        ),
+        gatherY: 344,
         body: (
           <g>
-            <path d="M112 322 Q112 462 140 470 L260 470 Q288 462 288 322 Z" fill="url(#gBasket)" />
-            {[0, 1, 2, 3].map((i) => (
-              <path
-                key={i}
-                d={`M112 ${346 + i * 30} Q200 ${360 + i * 30} 288 ${346 + i * 30}`}
-                fill="none"
-                stroke="#a9895a"
-                strokeWidth="1.2"
-                opacity="0.5"
-              />
-            ))}
-            <ellipse cx="200" cy="322" rx="90" ry="17" fill="#caa877" />
+            <clipPath id="basketClip">
+              <path d="M110 322 Q106 402 122 452 Q132 476 200 480 Q268 476 278 452 Q294 402 290 322 Z" />
+            </clipPath>
+            <path d="M110 322 Q106 402 122 452 Q132 476 200 480 Q268 476 278 452 Q294 402 290 322 Z" fill="url(#gBasket)" />
+            <g clipPath="url(#basketClip)">
+              {/* nan đan ngang */}
+              {Array.from({ length: 9 }).map((_, i) => {
+                const y = 332 + i * 16
+                return (
+                  <g key={i}>
+                    <path d={`M102 ${y} Q200 ${y + 8} 298 ${y}`} fill="none" stroke={i % 2 ? '#c1975c' : '#d6ae77'} strokeWidth="12" />
+                    <path d={`M102 ${y + 8} Q200 ${y + 16} 298 ${y + 8}`} fill="none" stroke="#9c774c" strokeWidth="1.4" opacity="0.45" />
+                  </g>
+                )
+              })}
+              {/* sợi dọc mờ tạo cảm giác đan */}
+              {Array.from({ length: 14 }).map((_, i) => (
+                <path key={i} d={`M${112 + i * 13} 324 L${112 + i * 13} 476`} stroke="#a98453" strokeWidth="1" opacity="0.22" />
+              ))}
+            </g>
+            {/* vành cuộn trên */}
+            <ellipse cx="200" cy="322" rx="92" ry="18" fill="#c6995e" />
+            <ellipse cx="200" cy="320" rx="91" ry="15" fill="none" stroke="#e2c692" strokeWidth="3" opacity="0.7" />
+            {Array.from({ length: 24 }).map((_, i) => {
+              const a = (i / 24) * Math.PI
+              const x = 200 - Math.cos(a) * 90
+              const y = 322 - Math.sin(a) * 16
+              return <line key={i} x1={x} y1={y - 4} x2={x + 6} y2={y + 5} stroke="#9c774c" strokeWidth="1.4" opacity="0.5" />
+            })}
+            {/* miệng giỏ */}
             <ellipse cx="200" cy="320" rx="80" ry="13" fill="#b7c0a6" />
           </g>
         ),
-        front: <path d="M112 322 Q200 340 288 322" stroke="#a9895a" strokeWidth="2.5" fill="none" opacity="0.6" />,
+        front: (
+          <g>
+            {/* tai cầm hai bên */}
+            <path d="M276 328 c 24 2 26 42 -2 44" fill="none" stroke="#bd934f" strokeWidth="7" strokeLinecap="round" />
+            <path d="M124 328 c -24 2 -26 42 2 44" fill="none" stroke="#bd934f" strokeWidth="7" strokeLinecap="round" />
+            <path d="M276 328 c 24 2 26 42 -2 44" fill="none" stroke="#e0c290" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+            <path d="M124 328 c -24 2 -26 42 2 44" fill="none" stroke="#e0c290" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+            <path d="M110 322 Q200 338 290 322" stroke="#9c774c" strokeWidth="2" fill="none" opacity="0.45" />
+          </g>
+        ),
       }
 
     case 'kraft':
@@ -293,7 +330,7 @@ export default function Bouquet({ templateId, wrapId = 'kraft', palette, params,
   }
 
   const wrap = getWrap(wrapId)
-  const stems = stemPaths(wrap.gatherY, 5, wrapId === 'vase' ? 10 : 15)
+  const stems = stemPathsTo(wrap.gatherY, heads)
 
   return (
     <svg {...svgProps}>
