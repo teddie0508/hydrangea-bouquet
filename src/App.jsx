@@ -63,7 +63,7 @@ function Loader() {
   return (
     <div className="loader">
       <div className="loader-flower" aria-hidden>
-        🌸
+        🤓
       </div>
       <p>đang tải…</p>
     </div>
